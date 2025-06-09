@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Morpion Minimaliste</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      font-family: 'Montserrat', Arial, sans-serif;
+      min-height: 100vh;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100vw;
+    }
+    h1 {
+      margin: 0 0 24px 0;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #232323;
+      letter-spacing: 1px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      grid-template-rows: repeat(3, 70px);
+      gap: 12px;
+      background: #f7f7f7;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px #0001;
+      padding: 22px;
+      margin-bottom: 32px;
+      transition: box-shadow .3s;
+    }
+    .cell {
+      width: 70px;
+      height: 70px;
+      background: #fff;
+      border: none;
+      border-radius: 18px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #232323;
+      cursor: pointer;
+      transition: background .2s, box-shadow .2s;
+      box-shadow: 0 2px 8px #0002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+      position: relative;
+      z-index: 1;
+      user-select: none;
+    }
+    .cell:active {
+      background: #efefef;
+    }
+    .cell.win {
+      background: #c3fcde;
+      animation: win-bounce .34s cubic-bezier(.61,-0.25,.38,1.25) 2 alternate;
+      color: #18ae68;
+      z-index: 3;
+    }
+    @keyframes win-bounce {
+      to {
+        transform: scale(1.13) rotate(-1.4deg);
+        box-shadow: 0 4px 22px #37ffb126;
+      }
+    }
+    .status {
+      font-size: 1.15rem;
+      margin-bottom: 24px;
+      color: #999;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      letter-spacing: .5px;
+      min-height: 32px;
+    }
+    .restart-btn {
+      background: #232323;
+      color: #fff;
+      border: none;
+      padding: 13px 36px;
+      font-size: 1rem;
+      font-family: inherit;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 6px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: background .18s, box-shadow .2s;
+      box-shadow: 0 2px 12px #0001;
+    }
+    .restart-btn:hover, .restart-btn:focus {
+      background: #0ca971;
+      box-shadow: 0 4px 18px #37ffb134;
+      outline: none;
+    }
+    @media (max-width: 600px) {
+      .board {
+        grid-template-columns: repeat(3, 20vw);
+        grid-template-rows: repeat(3, 20vw);
+        padding: 4vw;
+        border-radius: 8vw;
+        gap: 3vw;
+      }
+      .cell {
+        border-radius: 5vw;
+        font-size: 7vw;
+        width: 20vw;
+        height: 20vw;
+      }
+      .restart-btn {
+        font-size: 1.1rem;
+        padding: 12px 20px;
+      }
+      h1 {
+        font-size: 7vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Morpion</h1>
+    <div class="status" id="status"></div>
+    <div class="board" id="board"></div>
+    <button class="restart-btn" id="restartBtn">Recommencer</button>
+  </div>
+  <script>
+    const board = document.getElementById('board');
+    const statusDiv = document.getElementById('status');
+    const restartBtn = document.getElementById('restartBtn');
+    const X = '✕';
+    const O = '◯';
+
+    let cells = [];
+    let game, isGameOver, current;
+
+    function init() {
+      board.innerHTML = '';
+      cells = [];
+      for(let i = 0; i < 9; i++) {
+        const cell = document.createElement('button');
+        cell.className = 'cell';
+        cell.setAttribute('data-index', i);
+        cell.addEventListener('click', onCellClick);
+        cells.push(cell);
+        board.appendChild(cell);
+      }
+      game = Array(9).fill('');
+      isGameOver = false;
+      current = X;
+      updateStatus();
+    }
+
+    function onCellClick(e) {
+      if (isGameOver) return;
+      const idx = +e.currentTarget.getAttribute('data-index');
+      if (game[idx]) return;
+      game[idx] = current;
+      e.currentTarget.textContent = current;      
+      checkGame();
+      if (!isGameOver) {
+        current = current === X ? O : X;
+        updateStatus();
+      }
+    }
+
+    function updateStatus(msg) {
+      if (msg !== undefined) {
+        statusDiv.textContent = msg;
+      } else if (!isGameOver) {
+        statusDiv.innerHTML = `<strong>${current}</strong>, à vous de jouer`;
+      }
+    }
+
+    function checkGame() {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (let comb of wins) {
+        const [a,b,c] = comb;
+        if (game[a] && game[a] === game[b] && game[a] === game[c]) {
+          showWin([a,b,c]);
+          updateStatus(`Victoire de ${game[a]} !`);
+          isGameOver = true;
+          return;
+        }
+      }
+      if (game.every(cell => cell)) {
+        updateStatus("Égalité !");
+        isGameOver = true;
+      }
+    }
+
+    function showWin(indices) {
+      indices.forEach(i => {
+        cells[i].classList.add('win');
+      });
+    }
+
+    restartBtn.addEventListener('click', () => {
+      init();
+    });
+
+    window.addEventListener('resize', ()=>{
+      // Allow board to stay centered/fit nicely on mobile.
+      // No action needed since CSS handles it, but could adjust font size dynamically if needed.
+    });
+
+    init();
+  </script>
+</body>
+</html>
