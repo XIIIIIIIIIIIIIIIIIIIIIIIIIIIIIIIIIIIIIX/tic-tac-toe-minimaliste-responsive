@@ -1,0 +1,129 @@
+html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      font-family: 'Montserrat', Arial, sans-serif;
+      min-height: 100vh;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100vw;
+    }
+    h1 {
+      margin: 0 0 24px 0;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #232323;
+      letter-spacing: 1px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      grid-template-rows: repeat(3, 70px);
+      gap: 12px;
+      background: #f7f7f7;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px #0001;
+      padding: 22px;
+      margin-bottom: 32px;
+      transition: box-shadow .3s;
+    }
+    .cell {
+      width: 70px;
+      height: 70px;
+      background: #fff;
+      border: none;
+      border-radius: 18px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #232323;
+      cursor: pointer;
+      transition: background .2s, box-shadow .2s;
+      box-shadow: 0 2px 8px #0002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+      position: relative;
+      z-index: 1;
+      user-select: none;
+    }
+    .cell:active {
+      background: #efefef;
+    }
+    .cell.win {
+      background: #c3fcde;
+      animation: win-bounce .34s cubic-bezier(.61,-0.25,.38,1.25) 2 alternate;
+      color: #18ae68;
+      z-index: 3;
+    }
+    @keyframes win-bounce {
+      to {
+        transform: scale(1.13) rotate(-1.4deg);
+        box-shadow: 0 4px 22px #37ffb126;
+      }
+    }
+    .status {
+      font-size: 1.15rem;
+      margin-bottom: 24px;
+      color: #999;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      letter-spacing: .5px;
+      min-height: 32px;
+    }
+    .restart-btn {
+      background: #232323;
+      color: #fff;
+      border: none;
+      padding: 13px 36px;
+      font-size: 1rem;
+      font-family: inherit;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 6px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: background .18s, box-shadow .2s;
+      box-shadow: 0 2px 12px #0001;
+    }
+    .restart-btn:hover, .restart-btn:focus {
+      background: #0ca971;
+      box-shadow: 0 4px 18px #37ffb134;
+      outline: none;
+    }
+    @media (max-width: 600px) {
+      .board {
+        grid-template-columns: repeat(3, 20vw);
+        grid-template-rows: repeat(3, 20vw);
+        padding: 4vw;
+        border-radius: 8vw;
+        gap: 3vw;
+      }
+      .cell {
+        border-radius: 5vw;
+        font-size: 7vw;
+        width: 20vw;
+        height: 20vw;
+      }
+      .restart-btn {
+        font-size: 1.1rem;
+        padding: 12px 20px;
+      }
+      h1 {
+        font-size: 7vw;
+      }
+    }
